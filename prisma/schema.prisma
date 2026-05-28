@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id        Int      @id @default(autoincrement())
+  code      String?  // Keep code for internal ID if needed, but UI hides it
+  name      String
+  cnpj      String?  // Added CNPJ
+  phone     String?
+  email     String?  // Added Email contact
+  address   String?
+  city      String?
+  contact   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reports   Report[]
+}
+
+model Report {
+  id        Int      @id @default(autoincrement())
+  date      DateTime @default(now())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Client Relation
+  clientId Int
+  client   Client @relation(fields: [clientId], references: [id])
+
+  // Transport
+  departureDate DateTime?
+  arrivalDate   DateTime?
+  departureKm   Float?
+  arrivalKm     Float?
+  totalKm       Float?
+  departureTime String?
+  arrivalTime   String?
+  totalHours    String?
+
+  // Expenses
+  expensesAdvances Float?
+  expensesFuel     Float?
+  expensesHotel    Float?
+  expensesMeals    Float?
+  expensesTolls    Float?
+  expensesTickets  Float?
+  expensesOthers   Float?
+  expensesSundry   Float?
+  expensesTotal    Float?
+
+  // Text Fields
+  description        String?
+  mattersTreated     String?
+  clientObservations String?
+
+  // Footer
+  technicianName String?
+  clientSignature String? // Base64 signature
+
+  // Relations
+  authorId Int?
+  author   User? @relation(fields: [authorId], references: [id])
+  serviceHours ReportServiceHour[]
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  reports   Report[]
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+model ReportServiceHour {
+  id       Int     @id @default(autoincrement())
+  reportId Int
+  report   Report  @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  day      String?
+  in       String?
+  out      String?
+  total    String?
+}
