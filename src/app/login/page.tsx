@@ -16,7 +16,7 @@ export default function LoginPage() {
             <div className="absolute top-[-10%] left-[-10%] w-96 h-96 bg-emerald-100/50 rounded-full filter blur-3xl -z-10" />
             <div className="absolute bottom-[-10%] right-[-10%] w-96 h-96 bg-blue-100/40 rounded-full filter blur-3xl -z-10" />
 
-            <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
+            <div className="w-full max-w-md mx-auto text-center">
                 <div className="inline-flex items-center justify-center p-3 bg-white border border-slate-200 shadow-md rounded-2xl mb-4">
                     <img src="/apple-icon.png" alt="Logo RVAT" className="w-12 h-12 object-contain" />
                 </div>
@@ -28,8 +28,8 @@ export default function LoginPage() {
                 </p>
             </div>
 
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-                <div className="bg-white py-8 px-6 shadow-lg rounded-2xl border border-slate-150 sm:px-10">
+            <div className="mt-8 w-full max-w-md mx-auto">
+                <div className="bg-white py-6 px-4 sm:py-8 sm:px-10 shadow-lg rounded-2xl border border-slate-150">
                     <form action={dispatch} className="space-y-6" autoComplete="off">
                         {/* Email Input */}
                         <div>
