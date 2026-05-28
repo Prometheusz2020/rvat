@@ -59,31 +59,31 @@ export default async function Dashboard() {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           {/* Reports this Month */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
-            <div className="p-3 bg-emerald-100 rounded-full mr-4">
+          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex items-center hover:shadow-lg transition-all duration-300">
+            <div className="p-4 bg-emerald-50 rounded-xl mr-4 border border-emerald-100">
               <FiActivity className="h-6 w-6 text-emerald-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Relatórios (Este Mês)</p>
-              <p className="text-2xl font-bold text-gray-900">{monthReports}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Relatórios (Este Mês)</p>
+              <p className="text-3xl font-black text-gray-950 mt-0.5">{monthReports}</p>
             </div>
           </div>
 
           {/* Total Reports */}
-          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100 flex items-center">
-            <div className="p-3 bg-blue-100 rounded-full mr-4">
+          <div className="bg-white p-6 rounded-2xl shadow-md border border-gray-100 flex items-center hover:shadow-lg transition-all duration-300">
+            <div className="p-4 bg-blue-50 rounded-xl mr-4 border border-blue-100">
               <FiFileText className="h-6 w-6 text-blue-600" />
             </div>
             <div>
-              <p className="text-sm font-medium text-gray-500">Total de Relatórios</p>
-              <p className="text-2xl font-bold text-gray-900">{totalReports}</p>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">Total de Relatórios</p>
+              <p className="text-3xl font-black text-gray-950 mt-0.5">{totalReports}</p>
             </div>
           </div>
 
           {/* New Report Action Card */}
-          <Link href="/reports/new" className="bg-emerald-600 p-6 rounded-lg shadow hover:bg-emerald-700 transition flex items-center justify-center text-white group cursor-pointer">
-            <FiPlus className="h-8 w-8 mr-3 group-hover:scale-110 transition-transform" />
-            <span className="text-lg font-bold">Novo Relatório</span>
+          <Link href="/reports/new" className="bg-gradient-to-br from-emerald-600 to-emerald-700 p-6 rounded-2xl shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center text-white group cursor-pointer transform hover:-translate-y-0.5 border border-emerald-500/20">
+            <FiPlus className="h-7 w-7 mr-2.5 group-hover:scale-110 transition-transform stroke-[2.5]" />
+            <span className="text-lg font-black tracking-wide">Novo Relatório</span>
           </Link>
         </div>
 
