@@ -69,7 +69,7 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
     };
 
     // Determine if user can edit/delete
-    const canManage = session?.user?.role === 'ADMIN' || session?.user?.email === dbReport.technicianName || true; // Allow all logged users to edit relative to business logic (simplifying for now)
+    const canManage = session?.user?.role === 'ADMIN' || (dbReport.authorId !== null && dbReport.authorId === parseInt(session?.user?.id || ''));
 
     return (
         <div className="min-h-screen bg-gray-100 p-8 print:p-0 print:bg-white">
@@ -80,7 +80,7 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
                 </Link>
 
                 <div className="flex items-center gap-3">
-                    <ReportActions id={reportId} />
+                    {canManage && <ReportActions id={reportId} />}
                     <PrintButton />
                 </div>
             </div>

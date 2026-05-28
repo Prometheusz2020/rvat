@@ -4,10 +4,20 @@ import { prisma } from '@/lib/prisma';
 import { revalidatePath } from 'next/cache';
 import { TechnicalReport } from '@/types/report';
 import { redirect } from 'next/navigation';
+import { auth } from '@/auth';
 
 // Get recent reports for dashboard with filters
 export async function getReports(filters?: { clientName?: string; startDate?: string; endDate?: string }, limit = 50) {
+    const session = await auth();
+    if (!session || !session.user) {
+        throw new Error('Não autorizado');
+    }
+
     const where: any = {};
+
+    if (session.user.role !== 'ADMIN') {
+        where.authorId = parseInt(session.user.id);
+    }
 
     if (filters?.clientName) {
         where.client = {
@@ -32,14 +42,25 @@ export async function getReports(filters?: { clientName?: string; startDate?: st
 
 // Get Dashboard Stats
 export async function getDashboardStats() {
+    const session = await auth();
+    if (!session || !session.user) {
+        throw new Error('Não autorizado');
+    }
+
     const now = new Date();
     const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
     const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
 
+    const where: any = {};
+    if (session.user.role !== 'ADMIN') {
+        where.authorId = parseInt(session.user.id);
+    }
+
     const [totalReports, monthReports] = await Promise.all([
-        prisma.report.count(),
+        prisma.report.count({ where }),
         prisma.report.count({
             where: {
+                ...where,
                 date: {
                     gte: startOfMonth,
                     lte: endOfMonth
@@ -53,7 +74,18 @@ export async function getDashboardStats() {
 
 // Get Recent Reports (Top 5)
 export async function getRecentReports() {
+    const session = await auth();
+    if (!session || !session.user) {
+        throw new Error('Não autorizado');
+    }
+
+    const where: any = {};
+    if (session.user.role !== 'ADMIN') {
+        where.authorId = parseInt(session.user.id);
+    }
+
     return await prisma.report.findMany({
+        where,
         orderBy: { createdAt: 'desc' },
         include: { client: true },
         take: 5,
@@ -62,10 +94,22 @@ export async function getRecentReports() {
 
 // Get single report for viewing/editing
 export async function getReport(id: number) {
+    const session = await auth();
+    if (!session || !session.user) {
+        throw new Error('Não autorizado');
+    }
+
     const report = await prisma.report.findUnique({
         where: { id },
         include: { client: true, serviceHours: true },
     });
+
+    if (!report) return null;
+
+    if (session.user.role !== 'ADMIN' && report.authorId !== parseInt(session.user.id)) {
+        return null;
+    }
+
     return report;
 }
 
@@ -89,6 +133,11 @@ export async function searchClients(query: string) {
 
 // Create new report
 export async function createReport(data: TechnicalReport) {
+    const session = await auth();
+    if (!session || !session.user) {
+        throw new Error('Não autorizado');
+    }
+
     // 1. Find or create client
     let clientId = undefined;
 
@@ -157,6 +206,7 @@ export async function createReport(data: TechnicalReport) {
     // 2. Create Report
     const newReport = await prisma.report.create({
         data: {
+            authorId: parseInt(session.user.id),
             clientId,
             date: new Date(data.date || new Date()),
 
@@ -202,6 +252,23 @@ export async function createReport(data: TechnicalReport) {
 
 // Update existing report
 export async function updateReport(id: number, data: TechnicalReport) {
+    const session = await auth();
+    if (!session || !session.user) {
+        throw new Error('Não autorizado');
+    }
+
+    const report = await prisma.report.findUnique({
+        where: { id }
+    });
+
+    if (!report) {
+        throw new Error('Relatório não encontrado');
+    }
+
+    if (session.user.role !== 'ADMIN' && report.authorId !== parseInt(session.user.id)) {
+        throw new Error('Não autorizado a editar este relatório');
+    }
+
     let clientId = undefined;
 
     // Find client by name (since we rely on name mainly now)
@@ -290,6 +357,23 @@ export async function updateReport(id: number, data: TechnicalReport) {
 
 // Delete report
 export async function deleteReport(id: number) {
+    const session = await auth();
+    if (!session || !session.user) {
+        throw new Error('Não autorizado');
+    }
+
+    const report = await prisma.report.findUnique({
+        where: { id }
+    });
+
+    if (!report) {
+        throw new Error('Relatório não encontrado');
+    }
+
+    if (session.user.role !== 'ADMIN' && report.authorId !== parseInt(session.user.id)) {
+        throw new Error('Não autorizado a excluir este relatório');
+    }
+
     await prisma.report.delete({
         where: { id }
     });
