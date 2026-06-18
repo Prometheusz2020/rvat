@@ -2,6 +2,7 @@ import { getReport } from '@/app/actions';
 import { PrintLayout } from '@/components/PrintLayout';
 import PrintButton from '@/components/PrintButton';
 import ReportActions from '@/components/ReportActions';
+import WhatsAppShareButton from '@/components/WhatsAppShareButton';
 import { TechnicalReport } from '@/types/report';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -82,10 +83,16 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
                 <div className="flex items-center gap-3">
                     {canManage && <ReportActions id={reportId} />}
                     <PrintButton />
+                    <WhatsAppShareButton
+                        reportId={reportId}
+                        clientPhone={dbReport.client.phone}
+                        clientName={dbReport.client.name}
+                        reportDate={formattedDate}
+                    />
                 </div>
             </div>
 
-            <div className="shadow-2xl mx-auto print:shadow-none print:w-full print:m-0">
+            <div id="report-print-area" className="shadow-2xl mx-auto print:shadow-none print:w-full print:m-0">
                 <PrintLayout data={reportData} />
             </div>
 
