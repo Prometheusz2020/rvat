@@ -5,15 +5,11 @@ import { FaWhatsapp } from 'react-icons/fa';
 
 interface WhatsAppShareButtonProps {
     reportId: number;
-    clientPhone?: string | null;
-    clientName: string;
     reportDate: string;
 }
 
 export default function WhatsAppShareButton({
     reportId,
-    clientPhone,
-    clientName,
     reportDate,
 }: WhatsAppShareButtonProps) {
     const [isGenerating, setIsGenerating] = useState(false);
@@ -72,35 +68,10 @@ export default function WhatsAppShareButton({
             const fileName = `Relatorio_Mocmaq_${reportId}.pdf`;
             const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-            // 1. Always prompt to confirm or enter the phone number
-            const phoneDefaultValue = clientPhone || '';
-            const userInput = window.prompt(
-                'Confirme ou insira o número do WhatsApp do destinatário (com DDD, somente números):',
-                phoneDefaultValue
-            );
-            
-            if (userInput === null) {
-                setIsGenerating(false);
-                return; // User cancelled
-            }
-            
-            const phone = userInput.trim();
-            if (!phone) {
-                alert('Erro: O número de WhatsApp é obrigatório para enviar o relatório.');
-                setIsGenerating(false);
-                return;
-            }
-
-            // Clean phone number for WhatsApp Link (only digits, prefix with country code 55 if needed)
-            let cleanPhone = phone.replace(/\D/g, '');
-            if (cleanPhone && (cleanPhone.length === 10 || cleanPhone.length === 11)) {
-                cleanPhone = '55' + cleanPhone;
-            }
-
             // Prefilled message text
             const message = `Olá, segue o Relatório de Visita e Assistência Técnica Nº ${reportId} (MOCMAQ) referente ao atendimento de ${reportDate}.`;
 
-            // 2. Try to use Native Sharing (highly effective on mobile devices)
+            // 1. Try to use Native Sharing (highly effective on mobile devices)
             if (navigator.canShare && navigator.canShare({ files: [file] })) {
                 try {
                     await navigator.share({
@@ -115,7 +86,7 @@ export default function WhatsAppShareButton({
                 }
             }
 
-            // 3. Fallback: Download the PDF and open WhatsApp Web/App
+            // 2. Fallback: Download the PDF and open WhatsApp Web/App
             // Download PDF
             const url = URL.createObjectURL(pdfBlob);
             const a = document.createElement('a');
@@ -126,9 +97,9 @@ export default function WhatsAppShareButton({
             document.body.removeChild(a);
             URL.revokeObjectURL(url);
 
-            // Open WhatsApp with text
+            // Open WhatsApp with text (without phone number, so user chooses contact inside WhatsApp)
             const infoText = `${message}\n\n(O arquivo PDF foi baixado em seu dispositivo. Por favor, anexe-o na conversa do WhatsApp).`;
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encodeURIComponent(infoText)}`;
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(infoText)}`;
             window.open(whatsappUrl, '_blank');
 
         } catch (error) {

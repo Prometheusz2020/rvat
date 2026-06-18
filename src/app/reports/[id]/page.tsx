@@ -85,8 +85,6 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
                     <PrintButton />
                     <WhatsAppShareButton
                         reportId={reportId}
-                        clientPhone={dbReport.client.phone}
-                        clientName={dbReport.client.name}
                         reportDate={formattedDate}
                     />
                 </div>
