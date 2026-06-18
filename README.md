@@ -42,8 +42,8 @@ Adicionamos a funcionalidade de geração de PDF do relatório no lado do client
 ### Como funciona
 
 1. **Geração do PDF**:
-   - Utilizamos as bibliotecas `html2canvas` e `jspdf`.
-   - O elemento contendo o relatório (`#report-print-area`) é capturado via `html2canvas` como uma imagem de alta resolução (fidelidade A4).
+   - Utilizamos as bibliotecas `html2canvas-pro` e `jspdf`.
+   - O elemento contendo o relatório (`#report-print-area`) é capturado via `html2canvas-pro` como uma imagem de alta resolução (fidelidade A4). Essa biblioteca "pro" é necessária porque a versão base do `html2canvas` não possui suporte para funções de cor modernas do CSS (como `oklch` e `lab` utilizadas por padrão no Tailwind v4), resultando em erro ao renderizar o DOM.
    - O `jspdf` compila essa imagem em formato PDF A4 (suportando múltiplas páginas se necessário) gerando um Blob.
 
 2. **Fluxo de Envio**:
