@@ -72,18 +72,23 @@ export default function WhatsAppShareButton({
             const fileName = `Relatorio_Mocmaq_${reportId}.pdf`;
             const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
-            // 1. Get/Prompt phone number
-            let phone = clientPhone || '';
+            // 1. Always prompt to confirm or enter the phone number
+            const phoneDefaultValue = clientPhone || '';
+            const userInput = window.prompt(
+                'Confirme ou insira o número do WhatsApp do destinatário (com DDD, somente números):',
+                phoneDefaultValue
+            );
+            
+            if (userInput === null) {
+                setIsGenerating(false);
+                return; // User cancelled
+            }
+            
+            const phone = userInput.trim();
             if (!phone) {
-                const userInput = window.prompt(
-                    'Telefone do cliente não cadastrado. Insira o WhatsApp (com DDD, somente números) para enviar:',
-                    ''
-                );
-                if (userInput === null) {
-                    setIsGenerating(false);
-                    return; // cancelled
-                }
-                phone = userInput;
+                alert('Erro: O número de WhatsApp é obrigatório para enviar o relatório.');
+                setIsGenerating(false);
+                return;
             }
 
             // Clean phone number for WhatsApp Link (only digits, prefix with country code 55 if needed)

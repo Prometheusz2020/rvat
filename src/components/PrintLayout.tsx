@@ -8,8 +8,49 @@ interface PrintLayoutProps {
 }
 
 export const PrintLayout: React.FC<PrintLayoutProps> = ({ data }) => {
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [scale, setScale] = React.useState(1);
+    const [scaledHeight, setScaledHeight] = React.useState<number | string>('auto');
+
+    React.useEffect(() => {
+        const handleResize = () => {
+            const width = window.innerWidth;
+            const targetWidth = 794; // ~210mm at 96 DPI
+            if (width < targetWidth + 48) {
+                const s = (width - 48) / targetWidth;
+                setScale(s);
+                if (containerRef.current) {
+                    setScaledHeight(containerRef.current.scrollHeight * s);
+                }
+            } else {
+                setScale(1);
+                setScaledHeight('auto');
+            }
+        };
+        handleResize();
+        window.addEventListener('resize', handleResize);
+        
+        const timer = setTimeout(handleResize, 300);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            clearTimeout(timer);
+        };
+    }, []);
+
     return (
-        <div className="print-container bg-[#fcf8b5] text-black font-sans p-[12mm] w-[210mm] min-h-[297mm] mx-auto text-xs border border-gray-300 print:border-none print:m-0 print:w-full print:max-w-none print:p-0 flex flex-col justify-between shadow-lg print:shadow-none">
+        <div 
+            className="w-full flex justify-center py-4 print:p-0 print:block"
+            style={{ height: scaledHeight }}
+        >
+            <div 
+                ref={containerRef}
+                className="print-container bg-[#fcf8b5] text-black font-sans p-[12mm] w-[210mm] min-h-[297mm] text-xs border border-gray-300 print:border-none print:m-0 print:w-full print:max-w-none print:p-0 flex flex-col justify-between shadow-lg print:shadow-none"
+                style={{
+                    transform: scale === 1 ? 'none' : `scale(${scale})`,
+                    transformOrigin: 'top center',
+                    flexShrink: 0,
+                }}
+            >
             <style jsx global>{`
                 @media print {
                     @page {
@@ -200,6 +241,7 @@ export const PrintLayout: React.FC<PrintLayoutProps> = ({ data }) => {
             </div>
 
 
+        </div>
         </div>
     );
 };

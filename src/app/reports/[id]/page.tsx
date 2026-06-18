@@ -92,8 +92,8 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
                 </div>
             </div>
 
-            {/* A4 Document Wrapper with Scroll on Mobile */}
-            <div className="w-full overflow-x-auto flex justify-center py-4 print:overflow-visible print:p-0">
+            {/* A4 Document Wrapper */}
+            <div className="w-full flex justify-center print:block">
                 <div id="report-print-area" className="print:w-full print:m-0">
                     <PrintLayout data={reportData} />
                 </div>
