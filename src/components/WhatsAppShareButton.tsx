@@ -66,27 +66,10 @@ export default function WhatsAppShareButton({
 
             const pdfBlob = pdf.output('blob');
             const fileName = `Relatorio_Mocmaq_${reportId}.pdf`;
-            const file = new File([pdfBlob], fileName, { type: 'application/pdf' });
 
             // Prefilled message text
             const message = `Olá, segue o Relatório de Visita e Assistência Técnica Nº ${reportId} (MOCMAQ) referente ao atendimento de ${reportDate}.`;
 
-            // 1. Try to use Native Sharing (highly effective on mobile devices)
-            if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                try {
-                    await navigator.share({
-                        files: [file],
-                        title: `Relatório Técnico Nº ${reportId}`,
-                        text: message,
-                    });
-                    setIsGenerating(false);
-                    return;
-                } catch (shareError) {
-                    console.warn('Native share failed, falling back to download + link:', shareError);
-                }
-            }
-
-            // 2. Fallback: Download the PDF and open WhatsApp Web/App
             // Download PDF
             const url = URL.createObjectURL(pdfBlob);
             const a = document.createElement('a');
