@@ -18,7 +18,7 @@ export default function ReportActions({ id }: { id: number }) {
     };
 
     return (
-        <div className="flex space-x-3 print:hidden">
+        <div className="flex flex-wrap gap-2 print:hidden">
             <Link
                 href={`/reports/${id}/edit`}
                 className="flex items-center px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition shadow-sm font-medium"

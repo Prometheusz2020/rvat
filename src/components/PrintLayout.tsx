@@ -9,7 +9,7 @@ interface PrintLayoutProps {
 
 export const PrintLayout: React.FC<PrintLayoutProps> = ({ data }) => {
     return (
-        <div className="print-container bg-[#fcf8b5] text-black font-sans p-6 max-w-[210mm] mx-auto text-xs border border-gray-300 print:border-none print:m-0 print:w-full print:max-w-none print:p-0">
+        <div className="print-container bg-[#fcf8b5] text-black font-sans p-[12mm] w-[210mm] min-h-[297mm] mx-auto text-xs border border-gray-300 print:border-none print:m-0 print:w-full print:max-w-none print:p-0 flex flex-col justify-between shadow-lg print:shadow-none">
             <style jsx global>{`
                 @media print {
                     @page {

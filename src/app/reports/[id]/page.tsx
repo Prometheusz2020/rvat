@@ -73,14 +73,14 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
     const canManage = session?.user?.role === 'ADMIN' || (dbReport.authorId !== null && dbReport.authorId === parseInt(session?.user?.id || ''));
 
     return (
-        <div className="min-h-screen bg-gray-100 p-8 print:p-0 print:bg-white">
+        <div className="min-h-screen bg-gray-100 p-8 print:p-0 print:bg-white flex flex-col items-center">
             {/* Header Actions (Hidden when printing) */}
-            <div className="max-w-[210mm] mx-auto mb-6 flex flex-col md:flex-row justify-between items-center gap-4 print:hidden">
-                <Link href="/" className="text-gray-600 hover:text-gray-900 border px-3 py-2 rounded bg-white shadow-sm">
+            <div className="w-full max-w-[210mm] mx-auto mb-6 flex flex-col md:flex-row justify-between items-center gap-4 print:hidden px-4 md:px-0">
+                <Link href="/" className="text-gray-600 hover:text-gray-900 border px-3 py-2 rounded bg-white shadow-sm whitespace-nowrap">
                     ← Voltar ao Dashboard
                 </Link>
 
-                <div className="flex items-center gap-3">
+                <div className="flex flex-wrap justify-center md:justify-end items-center gap-3">
                     {canManage && <ReportActions id={reportId} />}
                     <PrintButton />
                     <WhatsAppShareButton
@@ -92,8 +92,11 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
                 </div>
             </div>
 
-            <div id="report-print-area" className="shadow-2xl mx-auto print:shadow-none print:w-full print:m-0">
-                <PrintLayout data={reportData} />
+            {/* A4 Document Wrapper with Scroll on Mobile */}
+            <div className="w-full overflow-x-auto flex justify-center py-4 print:overflow-visible print:p-0">
+                <div id="report-print-area" className="print:w-full print:m-0">
+                    <PrintLayout data={reportData} />
+                </div>
             </div>
 
             {/* Footer info showing formatted date just in case Layout doesn't use it, 
