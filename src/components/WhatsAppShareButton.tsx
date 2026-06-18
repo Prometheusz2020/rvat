@@ -22,7 +22,7 @@ export default function WhatsAppShareButton({
         setIsGenerating(true);
         try {
             // Dynamically import html2canvas and jspdf to avoid any SSR issues
-            const html2canvas = (await import('html2canvas')).default;
+            const html2canvas = (await import('html2canvas-pro')).default;
             const jsPDF = (await import('jspdf')).default;
 
             const element = document.getElementById('report-print-area');
