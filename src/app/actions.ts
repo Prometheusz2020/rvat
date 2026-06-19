@@ -5,6 +5,20 @@ import { revalidatePath } from 'next/cache';
 import { TechnicalReport } from '@/types/report';
 import { redirect } from 'next/navigation';
 import { auth } from '@/auth';
+import { getReportToken } from '@/lib/reportToken';
+
+// Re-export so pages can import from a single 'actions' module if needed
+export { getReportToken };
+
+// Fetch report for public access (validates token first, no login required)
+export async function getPublicReport(id: number, token: string) {
+    const expectedToken = getReportToken(id);
+    if (token !== expectedToken) return null;
+    return await prisma.report.findUnique({
+        where: { id },
+        include: { client: true, serviceHours: true },
+    });
+}
 
 // Get recent reports for dashboard with filters
 export async function getReports(filters?: { clientName?: string; startDate?: string; endDate?: string }, limit = 50) {

@@ -1,20 +1,24 @@
-import { getReport, getReportToken } from '@/app/actions';
+import { getPublicReport } from '@/app/actions';
 import { PrintLayout } from '@/components/PrintLayout';
 import PrintButton from '@/components/PrintButton';
-import ReportActions from '@/components/ReportActions';
-import WhatsAppShareButton from '@/components/WhatsAppShareButton';
 import { TechnicalReport } from '@/types/report';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { auth } from '@/auth';
 
-export default async function ViewReportPage({ params }: { params: Promise<{ id: string }> }) {
-    const session = await auth();
+export default async function PublicReportPage({
+    params,
+    searchParams,
+}: {
+    params: Promise<{ id: string }>;
+    searchParams: Promise<{ token?: string }>;
+}) {
     const { id } = await params;
+    const { token } = await searchParams;
     const reportId = parseInt(id);
-    if (isNaN(reportId)) return notFound();
 
-    const dbReport = await getReport(reportId);
+    if (isNaN(reportId) || !token) return notFound();
+
+    const dbReport = await getPublicReport(reportId, token);
     if (!dbReport) return notFound();
 
     // Formatting Date for Brazil
@@ -24,7 +28,7 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
     const reportData: TechnicalReport = {
         id: dbReport.id.toString(),
         reportNumber: dbReport.id.toString(),
-        date: formattedDate, // Use Brazil format for the printed report
+        date: formattedDate,
         client: {
             name: dbReport.client.name,
             code: dbReport.client.code || '',
@@ -60,7 +64,7 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
             day: sh.day || '',
             in: sh.in || '',
             out: sh.out || '',
-            total: sh.total || ''
+            total: sh.total || '',
         })),
         description: dbReport.description || '',
         mattersTreated: dbReport.mattersTreated || '',
@@ -69,52 +73,37 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
         clientSignature: dbReport.clientSignature || null,
     };
 
-    // Determine if user can edit/delete
-    const canManage = session?.user?.role === 'ADMIN' || (dbReport.authorId !== null && dbReport.authorId === parseInt(session?.user?.id || ''));
-
-    // Generate secure token for the public share link
-    const shareToken = getReportToken(reportId);
-
     return (
-        <div className="min-h-screen bg-gray-100 p-8 print:p-0 print:bg-white flex flex-col items-center">
+        <div className="min-h-screen bg-gray-100 py-6 print:p-0 print:bg-white flex flex-col items-center">
             {/* Header Actions (Hidden when printing) */}
-            <div className="w-full max-w-[210mm] mx-auto mb-6 flex flex-col md:flex-row justify-between items-center gap-4 print:hidden px-4 md:px-0">
-                <Link href="/" className="text-gray-600 hover:text-gray-900 border px-3 py-2 rounded bg-white shadow-sm whitespace-nowrap">
-                    ← Voltar ao Dashboard
-                </Link>
-
-                <div className="flex flex-wrap justify-center md:justify-end items-center gap-3">
-                    {canManage && <ReportActions id={reportId} />}
+            <div className="w-full max-w-[210mm] mx-auto mb-4 flex flex-col sm:flex-row justify-between items-center gap-3 print:hidden px-4">
+                <div className="text-center sm:text-left">
+                    <p className="text-sm text-gray-500">Relatório Técnico MOCMAQ</p>
+                    <p className="font-semibold text-gray-800">Nº {reportData.reportNumber} — {formattedDate}</p>
+                </div>
+                <div className="flex flex-wrap justify-center sm:justify-end items-center gap-3">
+                    <Link
+                        href="https://mocmaq.com"
+                        target="_blank"
+                        className="text-gray-600 hover:text-gray-900 border px-3 py-2 rounded bg-white shadow-sm text-sm"
+                    >
+                        mocmaq.com
+                    </Link>
                     <PrintButton />
-                    <WhatsAppShareButton
-                        reportId={reportId}
-                        reportDate={formattedDate}
-                        token={shareToken}
-                    />
                 </div>
             </div>
 
-            {/* A4 Document Wrapper */}
+            {/* A4 Document */}
             <div className="w-full flex justify-center print:block">
-                <div id="report-print-area" className="print:w-full print:m-0">
+                <div className="print:w-full print:m-0">
                     <PrintLayout data={reportData} />
                 </div>
             </div>
 
-            {/* Footer info showing formatted date just in case Layout doesn't use it, 
-                 but actually PrintLayout uses data.date. We need to pass formatted date to PrintLayout?
-                 Let's check PrintLayout props. It takes TechnicalReport. 
-                 If we want to fix the date IN THE REPORT, we should ensure reportData.date is formatted?
-                 TechnicalReport.date is string. 
-                 Usually ISO string YYYY-MM-DD is used for inputs.
-                 PrintLayout probably purely renders it. 
-                 Let's update reportData.date to be formatted IF PrintLayout doesn't format it.
-                 Wait, PrintLayout is shared. I should check PrintLayout. 
-                 I'll assume I need to pass the formatted date string if I want it fixed.
-                 But TechnicalReport expects date string.
-                 
-                 If I change reportData.date to 'DD/MM/YYYY', it works for display.
-             */}
+            {/* Disclaimer */}
+            <p className="mt-6 mb-3 text-xs text-gray-400 print:hidden text-center px-4">
+                Este relatório foi compartilhado via link seguro pela MOCMAQ Mococa Máquinas e Equipamentos Ltda.
+            </p>
         </div>
     );
 }

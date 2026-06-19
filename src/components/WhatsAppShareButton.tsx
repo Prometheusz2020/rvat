@@ -6,101 +6,41 @@ import { FaWhatsapp } from 'react-icons/fa';
 interface WhatsAppShareButtonProps {
     reportId: number;
     reportDate: string;
+    token: string;
 }
 
 export default function WhatsAppShareButton({
     reportId,
     reportDate,
+    token,
 }: WhatsAppShareButtonProps) {
-    const [isGenerating, setIsGenerating] = useState(false);
+    const [isSharing, setIsSharing] = useState(false);
 
-    const handleShare = async () => {
-        setIsGenerating(true);
+    const handleShare = () => {
+        setIsSharing(true);
         try {
-            // Dynamically import html2canvas and jspdf to avoid any SSR issues
-            const html2canvas = (await import('html2canvas-pro')).default;
-            const jsPDF = (await import('jspdf')).default;
+            // Generate the secure public URL for this report
+            const publicUrl = `${window.location.origin}/public/reports/${reportId}?token=${token}`;
 
-            const element = document.getElementById('report-print-area');
-            if (!element) {
-                alert('Erro: Área de impressão do relatório não encontrada.');
-                setIsGenerating(false);
-                return;
-            }
+            // Prefilled message text with the public link
+            const message = `Olá! Segue o Relatório de Visita e Assistência Técnica Nº ${reportId} (MOCMAQ) referente ao atendimento de ${reportDate}.\n\nVocê pode visualizar o relatório completo pelo link abaixo:\n${publicUrl}`;
 
-            // Capture the element using html2canvas
-            const canvas = await html2canvas(element, {
-                scale: 2, // High resolution
-                useCORS: true,
-                backgroundColor: '#fcf8b5', // Match the yellow-beige style of the layout
-                logging: false,
-            });
-
-            // Dimensions of A4 page
-            const imgWidth = 210; // mm
-            const pageHeight = 297; // mm
-            const imgHeight = (canvas.height * imgWidth) / canvas.width;
-            
-            const pdf = new jsPDF({
-                orientation: 'portrait',
-                unit: 'mm',
-                format: 'a4',
-            });
-
-            const imgData = canvas.toDataURL('image/jpeg', 0.95);
-            
-            // Add image to PDF
-            let heightLeft = imgHeight;
-            let position = 0;
-
-            pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-            heightLeft -= pageHeight;
-
-            // Handle multi-page PDFs if the report overflows A4 height
-            while (heightLeft >= 0) {
-                position = heightLeft - imgHeight;
-                pdf.addPage();
-                pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-                heightLeft -= pageHeight;
-            }
-
-            const pdfBlob = pdf.output('blob');
-            const fileName = `Relatorio_Mocmaq_${reportId}.pdf`;
-
-            // Prefilled message text
-            const message = `Olá, segue o Relatório de Visita e Assistência Técnica Nº ${reportId} (MOCMAQ) referente ao atendimento de ${reportDate}.`;
-
-            // Download PDF
-            const url = URL.createObjectURL(pdfBlob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            // Open WhatsApp with text (without phone number, so user chooses contact inside WhatsApp)
-            const infoText = `${message}\n\n(O arquivo PDF foi baixado em seu dispositivo. Por favor, anexe-o na conversa do WhatsApp).`;
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(infoText)}`;
+            // Open WhatsApp with the message (user selects the contact inside WhatsApp)
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
-
-        } catch (error) {
-            console.error('Error generating/sharing PDF:', error);
-            alert('Ocorreu um erro ao gerar o PDF do relatório.');
         } finally {
-            setIsGenerating(false);
+            setIsSharing(false);
         }
     };
 
     return (
         <button
             onClick={handleShare}
-            disabled={isGenerating}
+            disabled={isSharing}
             className="flex items-center gap-2 bg-[#25D366] text-white px-4 py-2 rounded shadow hover:bg-[#20ba5a] transition font-medium disabled:opacity-70 disabled:cursor-not-allowed"
         >
             <FaWhatsapp className="text-lg" />
-            {isGenerating ? 'Gerando PDF...' : 'Enviar por WhatsApp'}
+            Enviar por WhatsApp
         </button>
     );
 }
