@@ -27,8 +27,17 @@ export default function SaveImageButton({ reportId }: SaveImageButtonProps) {
             const canvas = await html2canvas(element, {
                 scale: 2,
                 useCORS: true,
-                backgroundColor: '#fcf8b5',
+                backgroundColor: null,
                 logging: false,
+                onclone: (clonedDoc) => {
+                    const clonedElement = clonedDoc.getElementById('report-print-area');
+                    if (clonedElement) {
+                        // Reset scaling transform, shadows, and borders in the clone for a perfect rendering
+                        clonedElement.style.transform = 'none';
+                        clonedElement.style.boxShadow = 'none';
+                        clonedElement.style.border = 'none';
+                    }
+                }
             });
 
             // Convert canvas to PNG blob

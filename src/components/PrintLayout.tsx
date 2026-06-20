@@ -44,6 +44,7 @@ export const PrintLayout: React.FC<PrintLayoutProps> = ({ data }) => {
         >
             <div 
                 ref={containerRef}
+                id="report-print-area"
                 className="print-container bg-[#fcf8b5] text-black font-sans p-[12mm] w-[210mm] min-h-[297mm] text-xs border border-gray-300 print:border-none print:m-0 print:w-full print:max-w-none print:p-0 flex flex-col justify-between shadow-lg print:shadow-none"
                 style={{
                     transform: scale === 1 ? 'none' : `scale(${scale})`,

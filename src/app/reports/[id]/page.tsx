@@ -98,7 +98,7 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
 
             {/* A4 Document Wrapper */}
             <div className="w-full flex justify-center print:block">
-                <div id="report-print-area" className="print:w-full print:m-0">
+                <div className="print:w-full print:m-0">
                     <PrintLayout data={reportData} />
                 </div>
             </div>
