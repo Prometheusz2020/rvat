@@ -3,6 +3,7 @@ import { PrintLayout } from '@/components/PrintLayout';
 import PrintButton from '@/components/PrintButton';
 import ReportActions from '@/components/ReportActions';
 import WhatsAppShareButton from '@/components/WhatsAppShareButton';
+import SaveImageButton from '@/components/SaveImageButton';
 import { TechnicalReport } from '@/types/report';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -86,6 +87,7 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
                 <div className="flex flex-wrap justify-center md:justify-end items-center gap-3">
                     {canManage && <ReportActions id={reportId} />}
                     <PrintButton />
+                    <SaveImageButton reportId={reportId.toString()} />
                     <WhatsAppShareButton
                         reportId={reportId}
                         reportDate={formattedDate}

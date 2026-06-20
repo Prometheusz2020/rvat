@@ -1,6 +1,7 @@
 import { getPublicReport } from '@/app/actions';
 import { PrintLayout } from '@/components/PrintLayout';
 import PrintButton from '@/components/PrintButton';
+import SaveImageButton from '@/components/SaveImageButton';
 import { TechnicalReport } from '@/types/report';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
@@ -90,12 +91,13 @@ export default async function PublicReportPage({
                         mocmaq.com
                     </Link>
                     <PrintButton />
+                    <SaveImageButton reportId={reportData.reportNumber} />
                 </div>
             </div>
 
             {/* A4 Document */}
             <div className="w-full flex justify-center print:block">
-                <div className="print:w-full print:m-0">
+                <div id="report-print-area" className="print:w-full print:m-0">
                     <PrintLayout data={reportData} />
                 </div>
             </div>
