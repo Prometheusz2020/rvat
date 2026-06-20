@@ -90,7 +90,6 @@ export default async function ViewReportPage({ params }: { params: Promise<{ id:
                         reportId={reportId}
                         reportDate={formattedDate}
                         token={shareToken}
-                        clientPhone={dbReport.client.phone || ''}
                     />
                 </div>
             </div>

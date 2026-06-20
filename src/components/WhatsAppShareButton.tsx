@@ -7,14 +7,12 @@ interface WhatsAppShareButtonProps {
     reportId: number;
     reportDate: string;
     token: string;
-    clientPhone?: string;
 }
 
 export default function WhatsAppShareButton({
     reportId,
     reportDate,
     token,
-    clientPhone,
 }: WhatsAppShareButtonProps) {
     const [isGenerating, setIsGenerating] = useState(false);
 
@@ -93,18 +91,10 @@ export default function WhatsAppShareButton({
                 }
             }
 
-            const cleanPhone = clientPhone ? clientPhone.replace(/\D/g, '') : '';
-            let formattedPhone = '';
-            if (cleanPhone) {
-                formattedPhone = cleanPhone.length === 10 || cleanPhone.length === 11 ? `55${cleanPhone}` : cleanPhone;
-            }
-
             const publicUrl = `${window.location.origin}/public/reports/${reportId}?token=${token}`;
             const fullMessage = `${message}\n\nVisualize o relatório online completo: ${publicUrl}`;
 
-            const whatsappUrl = formattedPhone 
-                ? `https://api.whatsapp.com/send?phone=${formattedPhone}&text=${encodeURIComponent(fullMessage)}`
-                : `https://api.whatsapp.com/send?text=${encodeURIComponent(fullMessage)}`;
+            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(fullMessage)}`;
 
             if (isMobile) {
                 // On mobile, if native share failed or wasn't supported, just open the WhatsApp link directly
